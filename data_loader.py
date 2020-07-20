@@ -14,7 +14,7 @@ import torchvision.transforms.functional as F
 
 
 class Data(Dataset):
-    def __init__(self, foldername, need_transform):
+    def __init__(self, foldername, need_transform, factor = 1):
         # parameters
         self.img_data_path = '{}/images'.format(foldername)
         self.img_data_path = [os.path.join(self.img_data_path, f)
@@ -24,6 +24,7 @@ class Data(Dataset):
         self.len = len(self.img_data_path)
         self.crop_size = (128, 128)
         self.need_transform = need_transform
+        self.factor = factor
     
 
     def __len__(self):
@@ -33,13 +34,13 @@ class Data(Dataset):
     def __getitem__(self, idx : int):
         img_name = self.img_data_path[idx]
         gt_name = self.ground_truth_path.format(img_name[img_name.find('IMG_') + 4 : -4])
-        # print(img_name, gt_name)
+        
 
         img = cv2.imread(img_name)
         with open(gt_name, 'rb') as f:
-            ground_truth = np.load(f)
+            ground_truth = np.load(f) * self.factor
         
-        # ground_truth = expand_dims(ground_truth, axis=2)
+
         if self.need_transform:
             sample = self.transform(img, ground_truth)
         else:
@@ -50,8 +51,6 @@ class Data(Dataset):
 
     def transform(self, image, ground_truth):
         # get the specific coordinate of cropping
-        orginal_shape = image.shape
-        orginal_truth = ground_truth
         image = F.to_pil_image(image)
         self.crop_indices = RandomCrop.get_params(
                             image, output_size = self.crop_size)
@@ -69,7 +68,7 @@ class Data(Dataset):
 
 
 if __name__ == '__main__':
-    data = Data('data/part_A_final/train_data', need_transform = True)
+    data = Data('data/part_B_final/train_data', need_transform = False)
     data_loader = DataLoader(data, batch_size = 32, num_workers = 4)
 
     total_step = len(data_loader)

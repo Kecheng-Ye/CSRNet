@@ -65,8 +65,8 @@ class CSRNet(nn.Module):
 
     
 
-CSRNet = CSRNet('net_configure/configure_3.txt')
-print(CSRNet.parameters())
+# CSRNet = CSRNet('net_configure/configure_3.txt')
+# print(CSRNet.parameters())
 # _input = torch.randn((1, 3, 768, 1024))
 # print(CSRNet.front_end(_input).size())
 # _input = torch.randn((1, 512, 96, 128))
